@@ -9,8 +9,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Data
-public class Query {
-    private String query;
-    private int page;
-    private int pageSize = 1;
+public class ErrorModel {
+    private String code;
+    private String message;
 }

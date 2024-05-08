@@ -1,5 +1,6 @@
 package com.example.analyticaldataquery.service;
 
+import com.example.analyticaldataquery.exception.InvalidQueryException;
 import com.example.analyticaldataquery.model.Query;
 import com.github.tennaito.rsql.jpa.JpaCriteriaQueryVisitor;
 import cz.jirutka.rsql.parser.RSQLParser;
@@ -28,8 +29,8 @@ public class UserActivityEventService {
 
     public List<UserActivityEvent> searchByQuery(Query query) {
         RSQLVisitor<CriteriaQuery<UserActivityEvent>, EntityManager> visitor = new JpaCriteriaQueryVisitor<>();
-        CriteriaQuery<UserActivityEvent> criteriaQuery = getCriteriaQuery(query.getQuery(), visitor);
-        List<UserActivityEvent> resultList = ((org.hibernate.query.Query<UserActivityEvent>)entityManager.createQuery(criteriaQuery))
+        var criteriaQuery = getCriteriaQuery(query.getQuery(), visitor);
+        var resultList = ((org.hibernate.query.Query<UserActivityEvent>)entityManager.createQuery(criteriaQuery))
                 .setOrder(Arrays.asList(Order.desc(UserActivityEvent.class, "eventId")))
                 .setFirstResult(query.getPage()).setMaxResults(query.getPageSize())
                 .getResultList();
@@ -46,7 +47,7 @@ public class UserActivityEventService {
             return rootNode.accept(visitor, entityManager);
         }catch (Exception e){
             log.error("An error happened while executing RSQL query", e);
-            throw new IllegalArgumentException(e.getMessage());
+            throw new InvalidQueryException(e.getMessage(), queryString);
         }
     }
 }
